@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="../css/options.css">
+        <script type="text/javascript" src="../util/helpers.js"></script>
+        <script type="text/javascript" src="../util/jquery.js"></script>
+        <link rel="icon" href="../../img/icon/icon128.png">
+    </head>
+    <body>
+        <div id="header">
+            <h1 id="title">Timed Web Blocker</h1>
+            <div id="donate">
+                <p>If you like this extension, please consider donating!</p>
+                <div id="banner">
+                    <a href="https://www.buymeacoffee.com/kyleh">
+                    <img src="../../img/banner/buymeacoffee.png" alt="buymeacoffee banner">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="main">
+            <div id="form-container">
+                <h2>Block Sites</h2>
+                <b id="reset-container">Blocked status currently resets at <input type="time" name="reset-time" id="reset-time" value="00:00"></b>
+                <div id="explanation">
+                    <p>Must be formatted as a valid URL. Those that are not will be ignored.</p>
+                    <p>Block multiple sites at once by putting them on different lines.</p>
+                    <p>
+                        Less is more: to block an entire website, leave off the http/https and www.<br>
+                        Ex: if only www.google.com is blocked, then docs.google.com will not be blocked.<br>
+                        google.com will block both.
+                    </p>
+                    <p>
+                        The more general rule will take precedence.<br>
+                        Ex: if google.com and docs.google.com are set to be blocked, then the rules set<br>
+                        for google.com will override the rules set for docs.google.com.
+                    </p>
+                </div>
+                <form id="site-form">
+                    <textarea id="site-input" name="site-input" rows="4" cols="40"></textarea>
+                    <input type="button" id="site-submit" value="Add Sites">
+                </form>
+                <hr>
+                <p style="font-size:12px;">
+                    Comments? Suggestions? Bugs? Write them <a href="https://forms.gle/5nny4ctLLSCjzudt7" style="font-size:12px;">here</a>.
+                </p>
+            </div>
+            <aside id="list-container">
+                <h3>Blocked Sites</h3>
+                <div id="block-adult">
+                    <p id="idk">Block Adult Sites</p>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                      </label>
+                </div>
+                <ul id="site-list"></ul>
+            </aside>
+        </div>
+
+        <script type="text/javascript" src="../js/options.js"></script>
+    </body>
+</html>

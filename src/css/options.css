@@ -1,0 +1,219 @@
+* {
+    font-size: 16px;
+}
+
+body {
+    padding:0;
+    margin:0;
+    background-color: #fffafa;
+}
+
+img {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+h1 {
+    font-size: 36px;
+}
+
+h2 {
+    font-size: 28px;
+}
+
+h3 {
+    font-size: 20px;
+}
+
+textarea {
+    width: 100%;
+}
+
+input[type="text"], input[type="time"], textarea {
+    background-color: #fffafa;
+}
+
+#header {
+    padding: 16px;
+    display: grid;
+    grid: 'title donate';
+    height: 100px;
+    border-bottom: 8px solid #dad4d4;
+    background-color: #e4dddd;
+}
+
+#title {
+    grid-area: title;
+    align-self: center;
+    width: auto;
+}
+
+#donate {
+    grid-area: donate;
+    right:0;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+#donate > #banner {
+    height: 25%;
+}
+
+#main {
+    display: grid;
+    grid: 'form lst' / auto 50%;
+    justify-content: center;
+    height: 100%;
+}
+
+#form-container {
+    grid-area: form;
+    padding: 0 10px 0 0;
+}
+
+#explanation * {
+    font-size: 12px;
+}
+
+#site-form {
+    align-self: center;
+}
+
+#site-input {
+    white-space: nowrap;
+}
+
+#site-list {
+    grid-area: lst;
+    padding: 0;
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    min-height: 50px;
+}
+
+.site-li {
+    display: flex;
+    position: relative;
+    list-style-type: none;
+    margin: 5px;
+    padding: 10px;
+    border-radius: 5px
+}
+
+.site-li:hover {
+    background-color: #f6f0f0;
+}
+
+.time-form {
+    padding: 0 10px 0 0;
+    border-right: 2px solid lightgray;
+}
+
+.time-form span {
+    margin: 0 5px 0 0;
+}
+
+.site-li p {
+    margin: 0 0 0 10px;
+}
+
+.remove-button {
+    position: absolute;
+    right: 10px;
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    color: red;
+    font-weight: 1000;
+}
+.remove-button:hover {
+    color: rgb(155, 0, 0);
+}
+.remove-button:active {
+    color: rgb(75, 0, 0);
+}
+
+#block-adult {
+    display: grid;
+    grid: 'block-adult switch';
+    width: 200px;
+}
+
+#block-adult > * {
+    grid-area: block-adult;
+    margin: 0 0 5px 0;
+}
+
+#block-adult #idk {
+    font-size: 16px;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    grid-area: switch;
+    position: relative;
+    justify-self: end;
+    width: 30px;
+    height: 17px;
+    right: 0;
+    bottom: -3px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #d3cccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 13px;
+    width: 13px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #dd4422;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #dd4422;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(13px);
+    -ms-transform: translateX(13px);
+    transform: translateX(13px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}

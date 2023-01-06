@@ -1,0 +1,16 @@
+* {
+    width: 225px;
+}
+
+body {
+    align-items: center;
+    background-color: #fffafa;
+}
+
+p {
+    font-size: 16px;
+}
+
+#test {
+    overflow: scroll;
+}

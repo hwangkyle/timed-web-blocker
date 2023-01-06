@@ -1,0 +1,38 @@
+{
+    "name": "Timed Web Blocker",
+    "description": "Track and block websites",
+    "version": "0.3.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "./src/js/background.js",
+        "type": "module"
+    },
+    "incognito": "split",
+    "permissions": [
+        "storage",
+        "tabs",
+        "declarativeNetRequest",
+        "alarms",
+        "windows"
+    ],
+    "host_permissions": [ "*://*/*" ],
+    "icons": {
+        "48": "./img/icon/icon48.png",
+        "128": "./img/icon/icon128.png"
+    },
+    "action": {
+        "default_popup": "./src/html/popup.html",
+        "default_icon": {
+            "48": "./img/icon/icon48.png",
+            "128": "./img/icon/icon128.png"
+        }
+    },
+    "options_page": "./src/html/options.html",
+    "declarative_net_request": {
+        "rule_resources": [{
+            "id": "1",
+            "enabled": false,
+            "path": "./src/json/adult.json"
+        }]
+    }
+}
