@@ -1,4 +1,4 @@
-const currTabInRules = async _ => {
+const currTabInRules = async () => {
     let dict = await chrome.storage.local.get('urlInfo');
     dict = dict.urlInfo;
     let tab;
@@ -9,7 +9,7 @@ const currTabInRules = async _ => {
     return undefined;
 };
 
-const resetRules = async _ => {
+const resetRules = async () => {
     let urlInfo = await chrome.storage.local.get('urlInfo');
     urlInfo = urlInfo.urlInfo;
     for (let url of Object.keys(urlInfo)) {
@@ -29,35 +29,29 @@ const resetRules = async _ => {
     chrome.declarativeNetRequest.updateDynamicRules(newRule);
 };
 
-const onChangeResetTime = async _ => {
+const onChangeResetTime = async () => {
     chrome.alarms.clearAll();
     let time = await chrome.storage.local.get('resetTime');
     time = time.resetTime;
     let [hr,mn] = time.split(':');
     hr = Number(hr);
     mn = Number(mn);
-    const currHr = new Date().getHours(), currMn = new Date().getMinutes();
-    let dayOffset = hr < currHr || (hr === currHr && mn < currMn) ? 1 : 0;
+    let d = new Date();
+
+    // compare current time to resetTime
+    if (d.getHours() > hr || (d.getHours()===hr && d.getMinutes()>mn))
+        d.setDate(d.getDate()+1);
+    d.setHours(hr);
+    d.setMinutes(mn);
+    d.setSeconds(0);
+
     chrome.alarms.create('',{
-        when : Date.UTC(
-            new Date().getFullYear(),
-            new Date().getMonth(),
-            new Date().getDate()+dayOffset,
-            hr,
-            new Date().getTimezoneOffset()+mn
-        )
+        when : d.getTime()
     });
     chrome.alarms.onAlarm.addListener(alarm => {
         resetRules();
-        let d = new Date();
         chrome.alarms.create('',{
-            when : Date.UTC(
-                d.getFullYear(),
-                d.getMonth(),
-                d.getDate()+dayOffset,
-                hr,
-                new Date().getTimezoneOffset()+mn
-            )
+            when : d.getTime()
         });
     });
 };

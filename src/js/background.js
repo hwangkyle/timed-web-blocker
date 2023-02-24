@@ -15,9 +15,8 @@ chrome.storage.local.get(null, result => {
     });
 });
 
-const blockSite = async (url, refTime) => {
+const blockSite = async (url, refTime, tabId) => {
     let rules = await chrome.declarativeNetRequest.getDynamicRules();
-    console.log(rules);
     let newRule = { addRules:[], removeRuleIds:[] };
     for (let rule of rules) {
         if (rule.condition.urlFilter === url) {
@@ -28,7 +27,7 @@ const blockSite = async (url, refTime) => {
             break;
         }
     }
-    chrome.declarativeNetRequest.updateDynamicRules(newRule, chrome.tabs.reload);
+    chrome.declarativeNetRequest.updateDynamicRules(newRule, ()=>chrome.tabs.update(tabId, {url:"/src/html/blocked.html"}));
     chrome.storage.local.get('urlInfo', r=>{
         let urlInfo = r.urlInfo;
         urlInfo[url].blocked=true;
@@ -37,7 +36,7 @@ const blockSite = async (url, refTime) => {
     })
 }
 
-const setTabInfo = async (url, urlInfo) => {
+const setTabInfo = async (url, urlInfo, tabId) => {
     if (!url || urlInfo.blocked) { chrome.storage.local.set({'currTabInfo':{}}); return; }
 
     // set up the timer for the current tab
@@ -46,9 +45,9 @@ const setTabInfo = async (url, urlInfo) => {
     let intervalId  = setInterval(function(){
         if (Date.now() - checkTime > urlInfo.maxTime) {
             clearInterval(intervalId);
-            blockSite(url, refTime);
+            blockSite(url, refTime, tabId);
         }
-    },500);
+    },1000);
 
     let currTabInfo = {
         url:url,
@@ -58,7 +57,7 @@ const setTabInfo = async (url, urlInfo) => {
     chrome.storage.local.set({'currTabInfo':currTabInfo});
 }
 
-async function update() {
+async function update(tabId) {
     const url = await currTabInRules();
 
     const response = await chrome.storage.local.get(['currTabInfo', 'urlInfo']);
@@ -75,8 +74,8 @@ async function update() {
         // if the current site is blocked, i.e. the time has reached the maximum
         // NOTE: i think urlInfo[url] is repetitive
         if (urlInfo[url] && urlInfo[url].blocked) {
-            setTabInfo(url, urlInfo[url]);
-            chrome.tabs.reload(); // so that the blocked page shows instead
+            setTabInfo(url, urlInfo[url], tabId);
+            chrome.tabs.update(tabId, {url:"/src/html/blocked.html"}); // so that the blocked page shows instead
             return;
         }
     }
@@ -84,7 +83,7 @@ async function update() {
     // if the previous tab was not on the rules list
     // then call setTabInfo with current url--no need to close off the previous one
     if (!prevTabInfo.url) {
-        setTabInfo(url, urlInfo[url]);
+        setTabInfo(url, urlInfo[url], tabId);
         return;
     }
 
@@ -99,22 +98,14 @@ async function update() {
     setTabInfo(); // purposely undefined
 }
 
-chrome.tabs.onActivated.addListener(async activeInfo => {
-    console.log("onActivated"); // DEBUG
-    update();
-});
+chrome.tabs.onActivated.addListener(activeInfo => update(activeInfo.tabId));
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    // console.log("onUpdated"); // DEBUG
     // this if statement is done bc I only want this to be called once
     // without this, onUpdated gets called multiple times
     // 'loading' is chosen bc I want it called asap
-    // NOTE: still gets called multiple times sometimes, but it's better with than without
+    // NOTE: still gets called multiple times sometimes, but it's fine
     if (changeInfo.status === 'loading') {
-        console.log("onUpdated -> loading"); // DEBUG
-        update();
+        update(tabId);
     }
 });
-
-chrome.windows.onRemoved.addListener(windowId => {
-
-})
+chrome.tabs.onRemoved.addListener((tabId, _) => update(tabId));

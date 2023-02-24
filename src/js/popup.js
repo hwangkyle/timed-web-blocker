@@ -1,19 +1,5 @@
-const e = $("#time")[0];
+const e = document.querySelector("#time");
 let intervalId;
-
-// const test = $("#test")[0];
-// chrome.storage.local.get(null, res => {
-//     test.innerHTML+=JSON.stringify(res)+"<br><br>";
-//     console.log(res)
-// });
-// chrome.alarms.getAll(res => {
-//     test.innerHTML+=JSON.stringify(res)+"<br><br>";
-//     console.log(res)
-// });
-// chrome.declarativeNetRequest.getDynamicRules(rules => {
-//     test.innerHTML+=JSON.stringify(rules)
-//     console.log(rules);
-// });
 
 const setTime = async _ => {
     let url = await currTabInRules();
@@ -28,7 +14,6 @@ const setTime = async _ => {
         let mtt =  milliToTime(t - Date.now());
         e.innerHTML = mtt ? mtt : "00:00:00";
         intervalId = setInterval(() => { 
-            console.log(intervalId)
             let mtt = milliToTime(t - Date.now());
             if (mtt) e.innerHTML = mtt;
             else {

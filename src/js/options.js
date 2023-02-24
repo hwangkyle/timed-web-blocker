@@ -25,15 +25,15 @@ const isValidUrl = urlString => {
 const msToMin = ms => ms/(1000*60);
 
 function drawList() {
-    const e = $("#site-list");
+    const e = document.querySelector("#site-list");
 
     chrome.declarativeNetRequest.getDynamicRules(async rules => {
         let urlInfo = await chrome.storage.local.get('urlInfo');
         urlInfo = urlInfo.urlInfo;
-        e.empty();
+        e.innerHTML = "";
         rules.forEach(obj => {
             let urlFilter = obj.condition.urlFilter;
-            e.append(`
+            e.innerHTML += `
                 <li class='site-li' id="${urlFilter}">
                     <div class="time-form">
                         <input type="text" class="site-time" size="1" placeholder=${urlInfo[urlFilter] ? msToMin(urlInfo[urlFilter].maxTime) : 0}>
@@ -43,11 +43,11 @@ function drawList() {
                     <p>${urlFilter}</p>
                     <button class="remove-button">X</button>
                 </li>
-            `);
+            `;
         });
-        $(".remove-button").click(removeBlockedSite);
-        $(".site-time").on('keypress', changeTime2);
-        $(".time-submit").click(changeTime1);
+        document.querySelectorAll(`.remove-button`).forEach(function(el) { el.addEventListener('click', removeBlockedSite) });
+        document.querySelectorAll(`.site-time`).forEach(function(el) { el.addEventListener('keypress', changeTime) });
+        document.querySelectorAll(`.time-submit`).forEach(function(el) { el.addEventListener('click', changeTime) });
     });
 }
 
@@ -78,12 +78,17 @@ function removeBlockedSite() {
     });
 }
 
-const _changeTime = (domain, el) => {
+function changeTime(e) {
+    if (e.key && e.key !== "Enter") return;
+
+    const domain = this.parentNode.parentNode.id;
+    const el = this.parentNode.firstElementChild;
+
     let time = el.value;
     el.value = "";
     if (isNaN(time) || time === "" || time < 0) return;
 
-    el.setAttribute("placeholder",time);
+    el.setAttribute("placeholder", time);
 
     time = Number(time);
     chrome.storage.local.get('urlInfo', result => {
@@ -108,22 +113,9 @@ const _changeTime = (domain, el) => {
         chrome.storage.local.set({'urlInfo': urlInfo});
     });
 };
-// NEEDS TO USE THE function KEYWORD, NOT =>
-function changeTime1() {
-    const domain = this.parentNode.parentNode.id;
-    const el = this.parentNode.firstElementChild;
-    _changeTime(domain, el);
-}
-// NEEDS TO USE THE function KEYWORD, NOT =>
-function changeTime2(e) {
-    if (e.which!='13') return;
-    const domain = this.parentNode.parentNode.id;
-    const el = this.parentNode.firstElementChild;
-    _changeTime(domain, el);
-}
 
 const addSite = () => {
-    let el = $('#site-input')[0];
+    let el = document.querySelector('#site-input');
     let v = el.value;
     if (v == "") return;
 
@@ -162,7 +154,7 @@ const addSite = () => {
             newRules.addRules.push({
                 "id": i,
                 "priority": 1,
-                "action": { "type": "allow", "redirect": { "extensionPath": "/../html/blocked.html" } },
+                "action": { "type": "allow", "redirect": { "extensionPath": "/src/html/blocked.html" } },
                 "condition": { "urlFilter": sites[i-urls.length-1], "resourceTypes": ["main_frame"] }
             });
             newRules.removeRuleIds.push(i);
@@ -210,94 +202,20 @@ function blockAdultSites(el) {
 
 document.addEventListener('DOMContentLoaded', () => {
     // chrome.storage.local.clear();
-    $("#site-submit")[0].addEventListener("click", addSite);
-    let adultSiteSwitch = $(".switch input")[0];
+    document.querySelector("#site-submit").addEventListener("click", addSite);
+
+    let adultSiteSwitch = document.querySelector(".switch input");
     chrome.storage.local.get('blockAdultSites', response => {
         adultSiteSwitch.checked = response.blockAdultSites;
         blockAdultSites(adultSiteSwitch);
     });
     adultSiteSwitch.addEventListener("click", function(){blockAdultSites(this)});
-    let timeEl = $("#reset-time")[0];
+
+    let timeEl = document.querySelector("#reset-time");
     chrome.storage.local.get('resetTime', result => timeEl.value = result.resetTime);
-    timeEl.addEventListener("input", _ => {
-        chrome.storage.local.set({'resetTime': timeEl.value}, _ => onChangeResetTime());
+    timeEl.addEventListener("input", () => {
+        chrome.storage.local.set({'resetTime': timeEl.value}, onChangeResetTime);
     });
+
     drawList();
 });
-
-
-const _d = {
-    get() {
-        chrome.storage.local.get(null, r => console.log(r));
-        chrome.declarativeNetRequest.getDynamicRules(r => console.log(r));
-    },
-
-    test(block=false, sites=['youtube.com', 'yahoo.com', 'reddit.com']) {
-        chrome.storage.local.get('urlInfo', result => {
-            sites.forEach(site => {
-                if (!result.urlInfo[site]) result.urlInfo[site] = {
-                    maxTime : 0,
-                    currTime : 0,
-                    urlPatterns : fToP(site),
-                    blocked : false
-                };
-            });
-            chrome.storage.local.set({'urlInfo': result.urlInfo});
-        });
-        chrome.declarativeNetRequest.getDynamicRules(rules => {
-            let urls = rules.map(rule => rule.condition.urlFilter);
-            for(let i=0;i<sites.length;++i)if(urls.indexOf(sites[i])>-1){sites.splice(i,1);--i;}
-            urls.push(...sites);
-            let newRules = { addRules:[], removeRuleIds: [] };
-            for (let i=1; i<=urls.length; ++i) {
-                newRules.addRules.push({
-                    "id": i,
-                    "priority": 1,
-                    "action": { "type": block?"block":"allow" },
-                    "condition": { "urlFilter": urls[i-1], "resourceTypes": ["main_frame"] }
-                })
-                newRules.removeRuleIds.push(i);
-            }
-            chrome.declarativeNetRequest.updateDynamicRules(newRules, drawList);
-        });
-    },
-
-    directBlock(url) {
-        chrome.declarativeNetRequest.getDynamicRules(rules => {
-            chrome.declarativeNetRequest.updateDynamicRules({
-                addRules : [{
-                    "id": rules.length+1,
-                    "priority": 1,
-                    "action": { "type": "block" },
-                    "condition": { "urlFilter": url, "domains":[url], "resourceTypes": ["main_frame"] }
-                }]
-            }, drawList);
-        });
-    },
-
-    redirect(url) {
-        chrome.declarativeNetRequest.getDynamicRules(rules => {
-            chrome.declarativeNetRequest.updateDynamicRules({
-                addRules : [{
-                    "id": rules.length+1,
-                    "priority": 1,
-                    "action": { "type": "redirect", "redirect": { "extensionPath": "/../blocked/blocked.html" } },
-                    "condition": { "urlFilter": url, "resourceTypes": ["main_frame"] }
-                }]
-            }, drawList);
-        });
-    },
-
-    reset() {
-        chrome.storage.local.clear();
-        chrome.declarativeNetRequest.updateDynamicRules({removeRuleIds:[1,2,3,4,5,6,7,8,9,10]});
-        chrome.storage.local.get(null, result => {
-            let items = {'currTabInfo':{}};
-            if (!result.urlInfo) items['urlInfo'] = {};
-            if (!result.resetTime) items['resetTime'] = "00:00";
-            chrome.storage.local.set(items, _=>{ onChangeResetTime(); drawList(); });
-        });
-    },
-
-    rt(block=true) { _d.reset(); setTimeout(()=>_d.test(block), 100);  }
-}
