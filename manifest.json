@@ -1,7 +1,7 @@
 {
     "name": "Timed Web Blocker",
     "description": "Track and block websites",
-    "version": "0.3.0",
+    "version": "1.0.1",
     "manifest_version": 3,
     "background": {
         "service_worker": "src/js/background.js",

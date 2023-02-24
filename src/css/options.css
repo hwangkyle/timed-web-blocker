@@ -62,6 +62,12 @@ input[type="text"], input[type="time"], textarea {
     height: 50%;
 }
 
+#reset-explanation {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+}
+
 #main {
     display: grid;
     grid: 'form lst' / auto 50%;

@@ -21,7 +21,16 @@
         <div id="main">
             <div id="form-container">
                 <h2>Block Sites</h2>
-                <b id="reset-container">Blocked status currently resets at <input type="time" name="reset-time" id="reset-time" value="00:00"></b>
+                <b id="reset-container">
+                    Blocked status currently resets at
+                    <input type="time" name="reset-time" id="reset-time" value="00:00">
+                    <p id="reset-explanation">
+                        NOTE: When changing the time, this is made such that the time will always<br>
+                        reset later in time.<br>
+                        Ex: The reset time is set to be 9:00. The current time is 8:30. If you set the<br>
+                        reset time to be 8:00, it will be for 8:00 tomorrow!
+                    </p>
+                </b>
                 <div id="explanation">
                     <p>Must be formatted as a valid URL. Those that are not will be ignored.</p>
                     <p>Block multiple sites at once by putting them on different lines.</p>
@@ -42,7 +51,8 @@
                 </form>
                 <hr>
                 <p style="font-size:12px;">
-                    Comments? Suggestions? Bugs? Write them <a href="https://forms.gle/5nny4ctLLSCjzudt7" style="font-size:12px;">here</a>.
+                    Comments? Suggestions? Bugs? Write them
+                    <a href="https://forms.gle/5nny4ctLLSCjzudt7" style="font-size:12px;">here</a>.
                 </p>
             </div>
             <aside id="list-container">

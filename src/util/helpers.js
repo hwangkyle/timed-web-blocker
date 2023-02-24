@@ -50,6 +50,7 @@ const onChangeResetTime = async () => {
     });
     chrome.alarms.onAlarm.addListener(alarm => {
         resetRules();
+        d.setDate(d.getDate()+1);
         chrome.alarms.create('',{
             when : d.getTime()
         });
